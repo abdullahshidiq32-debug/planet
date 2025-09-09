@@ -1,386 +1,246 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ISI HATINYA PEW</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            background: radial-gradient(circle, #ffe4f0, #ffc0cb);
-        }
-        canvas {
-            display: block;
-        }
-        .info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #880e4f;
-            font-size: 16px;
-            background: rgba(255 192 203 / 0.7);
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 10;
-            user-select: none;
-        }
-        .romantic-text {
-            font-size: 24px;
-            color: #ad1457;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ISI HATINYA PEW</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background: linear-gradient(160deg, #0d0d2b, #2b0040); }
+    canvas { display: block; }
+  </style>
 </head>
 <body>
-    <div id="scene-container" class="w-full h-screen"></div>
+  <div id="scene-container" class="w-full h-screen"></div>
 
-     <audio autoplay loop>
-        <source src="lagu planet.mp3" type="audio/mpeg">    
-        </audio>
+  <audio id="bg-music" autoplay loop muted>
+    <source src="lagu planet.mp3" type="audio/mpeg">
+  </audio>
 
-    <script>
-        // Scene setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(
-            75,
-            window.innerWidth / window.innerHeight,
-            0.1,
-            1000
-        );
-        const renderer = new THREE.WebGLRenderer({ antialias: true, transparent: false });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0xffc0cb, 1);
-        document.getElementById('scene-container').appendChild(renderer.domElement);
+  <script>
+    const bgMusic = document.getElementById("bg-music");
+    document.body.addEventListener("click", () => {
+      if (bgMusic.muted) {
+        bgMusic.muted = false;
+        bgMusic.play();
+      }
+    }, { once: true });
 
-        // Controls
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        camera.position.set(20, 10, 20);
-        controls.update();
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById("scene-container").appendChild(renderer.domElement);
 
-        // Planet geometry and material (esthetic pink)
-        const planetGeometry = new THREE.SphereGeometry(5, 128, 128);
-        const textureLoader = new THREE.TextureLoader();
-        const normalMap = textureLoader.load('https://threejs.org/examples/textures/water/Water_1_M_Normal.jpg');
-        const emissiveMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    camera.position.set(30,20,30);
+    controls.update();
 
-         const planetMaterial = new THREE.MeshStandardMaterial({
-            color:  0xff99cc,           // pink lembut romantis
-            metalness: 0.1,             // tidak terlalu logam
-            roughness: 0.2,             // agak halus biar sinar mantul
-            normalMap: normalMap,       // tetap ada tekstur
-            emissive: new THREE.Color(0xffffff), // pink terang bercahaya
-            emissiveMap: emissiveMap,
-            emissiveIntensity: 15.0,     // 🔥 sangat terang seperti matahari
-        });
+    const planetGeometry = new THREE.SphereGeometry(5,128,128);
+    const texLoader = new THREE.TextureLoader();
+    const normalMap = texLoader.load('https://threejs.org/examples/textures/water/Water_1_M_Normal.jpg');
+    const emissiveMap = texLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
+    const planetMaterial = new THREE.MeshStandardMaterial({
+      color: 0xff99cc, metalness: 0.1, roughness: 0.2,
+      normalMap: normalMap, emissive: new THREE.Color(0xffffff),
+      emissiveMap: emissiveMap, emissiveIntensity: 15.0
+    });
+    const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+    scene.add(planet);
 
-        const planet = new THREE.Mesh(planetGeometry, planetMaterial);
-        scene.add(planet);
+    planet.add(new THREE.PointLight(0xff66ff,12,400));
+    planet.add(new THREE.PointLight(0x66ccff,10,350));
+    planet.add(new THREE.PointLight(0xffffff,8,300));
 
-      // Lampu inti planet (pink, biru, putih)
-        const coreLightPink = new THREE.PointLight(0xff66ff, 12, 400);  // pink terang besar
-        const coreLightBlue = new THREE.PointLight(0x66ccff, 10, 350);  // biru lembut
-        const coreLightWhite = new THREE.PointLight(0xffffff, 8, 300);  // putih murni
-        planet.add(coreLightPink);
-        planet.add(coreLightBlue);
-        planet.add(coreLightWhite);
+    const glow = new THREE.Mesh(new THREE.SphereGeometry(7.5,64,64),
+      new THREE.MeshBasicMaterial({ color:0xff99ff, transparent:true, opacity:0.4 }));
+    planet.add(glow);
 
-        // Aura/glow romantis di luar planet
-        const glowMaterial = new THREE.MeshBasicMaterial({
-            color: 0xff99ff,  // pink lembut
-            transparent: true,
-            opacity: 0.4,
-        });
-        const glow = new THREE.Mesh(new THREE.SphereGeometry(7.5, 64, 64), glowMaterial);
-        planet.add(glow);
+    function gaweTulisan3D(huruf, font, ukuran=1) {
+      const grup = new THREE.Group();
+      const geo = new THREE.TextGeometry(huruf, {
+        font: font, size: ukuran, height: 0.3,
+        bevelEnabled:true, bevelThickness:0.05, bevelSize:0.05, bevelSegments:3
+      });
+      const matMain = new THREE.MeshStandardMaterial({ color:0xffffff, emissive:0xff69b4, emissiveIntensity:1.4 });
+      const mesh = new THREE.Mesh(geo, matMain);
+      grup.add(mesh);
 
-        // Orbiting words on first ring (horizontal) - sangat mencolok
-        const romanticWords1 = ['PENDEKKK', 'baik hatiii', 'Mndiriii', 'lucuu'];
-        const orbitingTexts1 = [];
-        romanticWords1.forEach((word, index) => {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = 256;
-            canvas.height = 64;
-            context.font = 'Bold 60px Arial'; // font besar
-            context.fillStyle = '#ffffff'; // putih cerah
-            context.fillText(word, 10, 50);
-            context.strokeStyle = '#ff1493'; // pink terang
-            context.lineWidth = 5; // outline tebal
-            context.strokeText(word, 10, 50);
+      const matShadow = new THREE.MeshStandardMaterial({ color:0x4B0082, transparent:true, opacity:0.8, emissive:0x8A2BE2, emissiveIntensity:1.5 });
+      const shadowMesh = new THREE.Mesh(geo, matShadow);
+      shadowMesh.scale.set(1.2,1.2,1.2);
+      shadowMesh.position.set(0.15,-0.15,-0.3);
+      grup.add(shadowMesh);
 
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.minFilter = THREE.LinearFilter;
-            texture.magFilter = THREE.LinearFilter;
-            const material = new THREE.SpriteMaterial({ map: texture });
-            const sprite = new THREE.Sprite(material);
-            sprite.scale.set(2, 1, 1); // skala besar
-            sprite.position.set(Math.cos(index * Math.PI / 2) * 8, 0, Math.sin(index * Math.PI / 2) * 8);
-            scene.add(sprite);
-            orbitingTexts1.push({ sprite, angle: index * Math.PI / 2 });
-        });
+      const glowMaterial = new THREE.MeshBasicMaterial({ color:0xff69b4, transparent:true, opacity:0.25 });
+      const glowMesh = new THREE.Mesh(geo, glowMaterial);
+      glowMesh.scale.set(1.6, 1.6, 1.6);
+      grup.add(glowMesh);
 
-        // Orbiting words on second ring (tilted) - sangat mencolok
-        const romanticWords2 = ['kinanti', 'nisrina', 'tunggadewiii', 'cantikkk buanget'];
-        const orbitingTexts2 = [];
-        const tiltAngle = Math.PI / 6;
-        romanticWords2.forEach((word, index) => {
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = 256;
-            canvas.height = 64;
-            context.font = 'Bold 40px Arial';
-            context.fillStyle = '#ffffff';
-            context.fillText(word, 10, 50);
-            context.strokeStyle = '#ff1493';
-            context.lineWidth = 5;
-            context.strokeText(word, 10, 50);
+      return grup;
+    }
 
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.minFilter = THREE.LinearFilter;
-            texture.magFilter = THREE.LinearFilter;
-            const material = new THREE.SpriteMaterial({ map: texture });
-            const sprite = new THREE.Sprite(material);
-            sprite.scale.set(2, 1, 1);
-            const x = Math.cos(index * Math.PI / 2) * 8;
-            const z = Math.sin(index * Math.PI / 2) * 8;
-            const tiltedY = z * Math.sin(tiltAngle);
-            const tiltedZ = z * Math.cos(tiltAngle);
-            sprite.position.set(x, tiltedY, tiltedZ);
-            scene.add(sprite);
-            orbitingTexts2.push({ sprite, angle: index * Math.PI / 2 });
-        });
+    let orbitingTexts1=[], orbitingTexts2=[], textsHorizontal=[], textsVertical=[], photoOrbitSprites=[], asteroidSprites=[];
 
-        // Horizontal spiraling text
-        const longTextHorizontal = 'MAKASIII CANTIKK UDA MAU UNEMENIN AKU TERUSSSS';
-        const numSegmentsHorizontal = longTextHorizontal.length;
-        const textsHorizontal = [];
+    const loader = new THREE.FontLoader();
+    loader.load("https://threejs.org/examples/fonts/helvetiker_bold.typeface.json", function(font){
 
-        for (let i = 0; i < numSegmentsHorizontal; i++) {
-            const angle = (i / numSegmentsHorizontal) * Math.PI * 4;
-            const radius = 5.5 + i * 0.1;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-            const y = (i / numSegmentsHorizontal - 0.5) * 10;
+      const text1="PENDEKKK baik hatiii Mndiriii lucuu";
+      text1.split("").forEach((char,i)=>{
+        const angle=-(i/text1.length)*Math.PI*2;
+        const radius=14;
+        const g=gaweTulisan3D(char,font,1);
+        g.position.set(Math.cos(angle)*radius,0,Math.sin(angle)*radius);
+        scene.add(g);
+        orbitingTexts1.push({group:g,angle,radius});
+      });
 
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = 64;
-            canvas.height = 64;
-            context.font = 'Bold 40px Arial';
-            context.fillStyle = '#ffffff';
-            context.fillText(longTextHorizontal[i], 10, 40);
-            context.strokeStyle = '#ff69b4';
-            context.lineWidth = 2;
-            context.strokeText(longTextHorizontal[i], 10, 40);
+      const text2="kinanti nisrina tunggadewiii cantikkk buanget";
+      const tilt=Math.PI/6;
+      text2.split("").forEach((char,i)=>{
+        const angle=-(i/text2.length)*Math.PI*2;
+        const radius=16;
+        const x=Math.cos(angle)*radius, z=Math.sin(angle)*radius;
+        const ty=z*Math.sin(tilt), tz=z*Math.cos(tilt);
+        const g=gaweTulisan3D(char,font,1);
+        g.position.set(x,ty,tz);
+        scene.add(g);
+        orbitingTexts2.push({group:g,angle,radius,tilt});
+      });
 
-            const texture = new THREE.CanvasTexture(canvas);
-            const material = new THREE.SpriteMaterial({ map: texture });
-            const sprite = new THREE.Sprite(material);
-            sprite.position.set(x, y, z);
-            sprite.scale.set(1, 1, 1);
-            scene.add(sprite);
-            textsHorizontal.push({ sprite, angle, radius });
-        }
+      const textH="MAKASIII CANTIKK UDA MAU UNEMENIN AKU TERUSSSS";
+      for(let i=0;i<textH.length;i++){
+        const char=textH[i];
+        const angle=-(i/textH.length)*Math.PI*4;
+        const radius=20+i*0.3;
+        const g=gaweTulisan3D(char,font,0.9);
+        g.position.set(Math.cos(angle)*radius,(i/textH.length-0.5)*20,Math.sin(angle)*radius);
+        scene.add(g);
+        textsHorizontal.push({group:g,angle,radius,index:i});
+      }
 
-        // Vertical spiraling text
-        const longTextVertical = 'AKU JANJI AKU BAKAL JADI YANG TERBAIK BUAT KAMUUUU';
-        const numSegmentsVertical = longTextVertical.length;
-        const textsVertical = [];
+      const textV="AKU JANJI AKU BAKAL JADI YANG TERBAIK BUAT KAMUUUU";
+      for(let i=0;i<textV.length;i++){
+        const char=textV[textV.length-1-i];
+        const angleY=-(i/textV.length)*Math.PI*4;
+        const radius=22+i*0.3;
+        const g=gaweTulisan3D(char,font,0.9);
+        g.position.set(Math.cos(angleY)*radius,Math.sin(angleY)*20,0);
+        scene.add(g);
+        textsVertical.push({group:g,angle:angleY,radius,index:i});
+      }
 
-        for (let i = 0; i < numSegmentsVertical; i++) {
-            const angleY = (i / numSegmentsVertical) * Math.PI * 4;
-            const radius = 6 + (i * 0.1) * 0.5;
-            const x = Math.cos(angleY) * radius;
-            const y = Math.sin(angleY) * 10;
-            const z = 0;
+      
+      const photoUrls=["./22-1.jpg","./22-10.jpg","./22-13.jpg","./22-14.jpg","./22-15.jpg","./22-2.jpg","./22-22.jpg","./22-3.jpg"];
+      const photoRadius = 21; 
+      const photoTilt = Math.PI/3; 
+      photoUrls.forEach((url,i)=>{
+        const tex=new THREE.TextureLoader().load(url);
+        const mat=new THREE.SpriteMaterial({map:tex});
+        const sprite=new THREE.Sprite(mat);
+        sprite.scale.set(3,3,1);
+        const baseAngle = (i/photoUrls.length)*Math.PI*2 + (Math.PI / (photoUrls.length*2)); 
+        sprite.userData = { angle: baseAngle, radius: photoRadius, tilt: photoTilt };
+        
+        const a = baseAngle;
+        const xr = Math.cos(a) * photoRadius;
+        const zr = Math.sin(a) * photoRadius;
+        const yr = zr * Math.sin(photoTilt);
+        const zr2 = zr * Math.cos(photoTilt);
+        sprite.position.set(xr, yr, zr2);
+        scene.add(sprite);
+        photoOrbitSprites.push(sprite);
+      });
 
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = 64;
-            canvas.height = 64;
-            context.font = 'Bold 40px Arial';
-            context.fillStyle = '#ffffff';
-            context.fillText(longTextVertical[i], 10, 40);
-            context.strokeStyle = '#ff69b4';
-            context.lineWidth = 2;
-            context.strokeText(longTextVertical[i], 10, 40);
+    
+      const asteroidGifUrls=["./22-13.jpg","./22-10.jpg","./22-14.jpg","./22-22.jpg"];
+      for(let i=0;i<500;i++){
+        const url=asteroidGifUrls[i%asteroidGifUrls.length];
+        const tex=new THREE.TextureLoader().load(url);
+        const mat=new THREE.SpriteMaterial({map:tex,transparent:true});
+        const sprite=new THREE.Sprite(mat);
+        const scale=0.5+Math.random()*0.5;
+        sprite.scale.set(scale,scale,1);
+        const radius=40+Math.random()*25;
+        const angle=Math.random()*Math.PI*2;
+        const x=Math.cos(angle)*radius, z=Math.sin(angle)*radius, y=(Math.random()-0.5)*15;
+        sprite.position.set(x,y,z);
+        asteroidSprites.push({sprite,basePosition:new THREE.Vector3(x,y,z),floatOffset:Math.random()*1000,floatSpeed:0.001+Math.random()*0.002,rotationSpeed:(Math.random()-0.5)*0.01});
+        scene.add(sprite);
+      }
 
-            const texture = new THREE.CanvasTexture(canvas);
-            const material = new THREE.SpriteMaterial({ map: texture });
-            const sprite = new THREE.Sprite(material);
-            sprite.position.set(x, y, z);
-            sprite.scale.set(1, 1, 1);
-            scene.add(sprite);
-            textsVertical.push({ sprite, angle: angleY, radius });
-        }
+    });
 
-        // Photo orbit ring (besar)
-        const photoOrbitSprites = [];
-        const photoUrls = [
-            "./22-1.jpg",
-            "./22-10.jpg",
-            "./22-13.jpg",
-            "./22-14.jpg",
-            "./22-15.jpg",   
-            "./22-2.jpg",
-            "./22-22.jpg",
-            "./22-3.jpg"  
-        ];
+    function animate(){
+      requestAnimationFrame(animate);
+      planet.rotation.y+=0.005;
 
-        photoUrls.forEach((url, index) => {
-            const texture = new THREE.TextureLoader().load(url);
-            const material = new THREE.SpriteMaterial({ map: texture });
-            const sprite = new THREE.Sprite(material);
-            sprite.scale.set(2, 2, 1);
-            const angle = (index / photoUrls.length) * Math.PI * 2;
-            sprite.position.set(Math.cos(angle) * 9, 0, Math.sin(angle) * 9);
-            scene.add(sprite);
-            photoOrbitSprites.push({ sprite, angle });
-        });
+      orbitingTexts1.forEach(o=>{
+        o.angle+=0.01;
+        o.group.position.set(Math.cos(o.angle)*o.radius,0,Math.sin(o.angle)*o.radius);
+        o.group.lookAt(camera.position);
+      });
 
-        // Banyak asteroid kecil (foto gif imut) tersebar horizontal dan melayang
-        const asteroidSprites = [];
-        const asteroidCount = 500; // banyak asteroid kecil
+      orbitingTexts2.forEach(o=>{
+        o.angle+=0.01;
+        const x=Math.cos(o.angle)*o.radius, z=Math.sin(o.angle)*o.radius;
+        o.group.position.set(x,z*Math.sin(o.tilt),z*Math.cos(o.tilt));
+        o.group.lookAt(camera.position);
+      });
 
-        // Contoh URL GIF imut kecil (bebas pakai)
-        const asteroidGifUrls = [
-            "./22-13.jpg",
-            "./22-10.jpg",
-            "./22-14.jpg",
-            "./22-22.jpg"
-            // 'https://media.giphy.com/media/3o6ZtpxSZbQRRnwCKQ/giphy.gif', // bintang kecil berkelap-kelip
-            // 'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif', // hati berdenyut
-            // 'https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif', // bintang berputar
-            // 'https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif'  // bintang kecil berpendar
-        ];
+      textsHorizontal.forEach(o=>{
+        o.angle+=0.002;
+        const x=Math.cos(o.angle)*o.radius;
+        const z=Math.sin(o.angle)*o.radius;
+        const y=(o.index / textsHorizontal.length - 0.5) * 20;
+        o.group.position.set(x,y,z);
+        o.group.lookAt(camera.position);
+      });
 
-        for(let i=0; i<asteroidCount; i++) {
-            const url = asteroidGifUrls[i % asteroidGifUrls.length];
-            const texture = new THREE.TextureLoader().load(url);
-            const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
-            const sprite = new THREE.Sprite(material);
+      textsVertical.forEach(o=>{
+        o.angle+=0.002;
+        const x=Math.cos(o.angle)*o.radius;
+        const y=Math.sin(o.angle)*20;
+        o.group.position.set(x,y,0);
+        o.group.lookAt(camera.position);
+      });
 
-            // Ukuran kecil acak antara 0.1 - 0.3
-            const scale = 0.1 + Math.random() * 0.2;
-            sprite.scale.set(scale, scale, 1);
+      photoOrbitSprites.forEach(sprite=>{
+        sprite.userData.angle += 0.01;
+        const a = sprite.userData.angle;
+        const r = sprite.userData.radius;
+        const tilt = sprite.userData.tilt;
+        const xr = Math.cos(a) * r;
+        const zr = Math.sin(a) * r;
+        const yr = zr * Math.sin(tilt);
+        const zr2 = zr * Math.cos(tilt);
+        sprite.position.set(xr, yr, zr2);
+        sprite.lookAt(camera.position);
+      });
 
-            // Posisi acak di bidang horizontal (y sekitar ±0.5)
-            const radius = 15 + Math.random() * 25;
-            const angle = Math.random() * Math.PI * 2;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-            const y = (Math.random() - 0.5) * 1; // y kecil ±0.5
+      const t=Date.now();
+      asteroidSprites.forEach(o=>{
+        o.sprite.position.y=o.basePosition.y+Math.sin(t*o.floatSpeed+o.floatOffset)*0.3;
+        o.sprite.material.rotation+=o.rotationSpeed;
+        o.sprite.lookAt(camera.position);
+      });
 
-            sprite.position.set(x, y, z);
+      controls.update();
+      renderer.render(scene,camera);
+    }
+    animate();
 
-            // Simpan data untuk animasi melayang
-            asteroidSprites.push({
-                sprite,
-                basePosition: new THREE.Vector3(x, y, z),
-                floatOffset: Math.random() * 1000,
-                floatSpeed: 0.001 + Math.random() * 0.002,
-                rotationSpeed: (Math.random() - 0.5) * 0.01
-            });
-
-            scene.add(sprite);
-        }
-
-        // Animate loop
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Planet rotation
-            planet.rotation.x += 0.003;
-            planet.rotation.y += 0.007;
-
-            // Orbit texts ring 1 dengan skala berdenyut
-            const pulseSpeed = 0.005;
-            orbitingTexts1.forEach((textObj, i) => {
-                textObj.angle += 0.02;
-                textObj.sprite.position.set(
-                    Math.cos(textObj.angle) * 8,
-                    0,
-                    Math.sin(textObj.angle) * 8
-                );
-                const scale = 2 + 0.5 * Math.sin(Date.now() * pulseSpeed + i);
-                textObj.sprite.scale.set(scale, scale * 0.5, 1);
-                textObj.sprite.lookAt(camera.position);
-            });
-
-            // Orbit texts ring 2 tilted dengan skala berdenyut
-            orbitingTexts2.forEach((textObj, i) => {
-                textObj.angle += 0.02;
-                const x = Math.cos(textObj.angle) * 8;
-                const z = Math.sin(textObj.angle) * 8;
-                const tiltedY = z * Math.sin(tiltAngle);
-                const tiltedZ = z * Math.cos(tiltAngle);
-                textObj.sprite.position.set(x, tiltedY, tiltedZ);
-                const scale = 2 + 0.5 * Math.sin(Date.now() * pulseSpeed + i);
-                textObj.sprite.scale.set(scale, scale * 0.5, 1);
-                textObj.sprite.lookAt(camera.position);
-            });
-
-            // Horizontal spiraling text
-            textsHorizontal.forEach((textObj) => {
-                const angle = textObj.angle + Date.now() * 0.001;
-                const x = Math.cos(angle) * textObj.radius;
-                const z = Math.sin(angle) * textObj.radius;
-                textObj.sprite.position.set(x, Math.sin(angle * 2) * 2, z);
-                textObj.sprite.lookAt(camera.position);
-            });
-
-            // Vertical spiraling text
-            textsVertical.forEach((textObj) => {
-                const angle = textObj.angle + Date.now() * 0.001;
-                const x = Math.cos(angle) * textObj.radius;
-                const y = Math.sin(angle) * 10;
-                textObj.sprite.position.set(x, y, 0);
-                textObj.sprite.lookAt(camera.position);
-            });
-
-            // Photo orbit ring rotation
-            photoOrbitSprites.forEach((obj) => {
-                obj.angle += 0.015;
-                obj.sprite.position.set(
-                    Math.cos(obj.angle) * 9,
-                    0,
-                    Math.sin(obj.angle) * 9
-                );
-                obj.sprite.lookAt(camera.position);
-            });
-
-            // Animate asteroid kecil melayang dan berputar
-            const time = Date.now();
-            asteroidSprites.forEach((obj) => {
-                // Float up/down dengan sin wave kecil
-                const floatY = Math.sin(time * obj.floatSpeed + obj.floatOffset) * 0.3;
-                obj.sprite.position.y = obj.basePosition.y + floatY;
-
-                // Rotasi perlahan
-                obj.sprite.material.rotation += obj.rotationSpeed;
-
-                // Selalu menghadap kamera
-                obj.sprite.lookAt(camera.position);
-            });
-
-            controls.update();
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // Resize handler
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    </script>
+    window.addEventListener("resize",()=>{
+      camera.aspect=window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth,window.innerHeight);
+    });
+  </script>
 </body>
 </html>
