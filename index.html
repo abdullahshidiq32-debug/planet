@@ -114,7 +114,7 @@
         orbitingTexts2.push({group:g,angle,radius,tilt});
       });
 
-      const textH="MAKASIII CANTIKK UDA MAU NEMENIN AKU TERUSSSS";
+      const textH="MAKASIII CANTIKK UDA NEMENIN AKU TERUSSSS";
       for(let i=0;i<textH.length;i++){
         const char=textH[i];
         const angle=-(i/textH.length)*Math.PI*4;
@@ -160,14 +160,14 @@
 
     
       const asteroidGifUrls=["./22-4.jpg","./22-5.jpg","./22-6.jpg","./22-7.jpg","./22-8.jpg","./22-19.jpg"];
-      for(let i=0;i<500;i++){
+      for(let i=0;i<1000;i++){
         const url=asteroidGifUrls[i%asteroidGifUrls.length];
         const tex=new THREE.TextureLoader().load(url);
         const mat=new THREE.SpriteMaterial({map:tex,transparent:true});
         const sprite=new THREE.Sprite(mat);
         const scale=0.5+Math.random()*0.5;
         sprite.scale.set(scale,scale,1);
-        const radius=40+Math.random()*25;
+        const radius=60+Math.random()*35;
         const angle=Math.random()*Math.PI*2;
         const x=Math.cos(angle)*radius, z=Math.sin(angle)*radius, y=(Math.random()-0.5)*15;
         sprite.position.set(x,y,z);
